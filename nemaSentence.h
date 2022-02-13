@@ -29,8 +29,8 @@
  * 
  */
 
-#ifndef _GNSS_TYPEDEF_H_
-#define _GNSS_TYPEDEF_H_
+#ifndef _NEMA_SENTENCE_H_
+#define _NEMA_SENTENCE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,8 +51,8 @@ typedef enum GGATag
     GGA_eastWest        = 5, // 'E' = East | 'W' = West
     GGA_fixStatus       = 6, // '0' = Invalid
                              // '1' = GNSS fix
-                             // '2' =DGPS fix
-                             // '6' =Estimated (dead reckoning) Mode
+                             // '2' = DGPS fix
+                             // '6' = Estimated (dead reckoning) Mode
     GGA_SVNum           = 7, // Number of satellites being used (0~24)
     GGA_HDOP            = 8, // Horizontal dilution of precision
     GGA_atitude         = 9, // Altitude in meters according to WGS84 ellipsoid
@@ -159,9 +159,9 @@ typedef enum VTGTag
     VTG_courseGnd_M     = 3, // Course over ground (magnetic), not being output
     VTG_speed_knots     = 5, // Speed over ground in knots
     VTG_speed_kmh       = 7, // Speed over ground in km/h
-    VTG_positioningMode = 9, // 'N'=No fix
-                             // 'A'=Autonomous GNSS fix
-                             // 'D'=Differential GNSS fix
+    VTG_positioningMode = 9, // 'N'= No fix
+                             // 'A'= Autonomous GNSS fix
+                             // 'D'= Differential GNSS fix
     VTG_checksum        = 10, // Checksum
 
 }VTG_sentence;
@@ -185,10 +185,12 @@ typedef enum segmentsTag{
     //VTG-Track Made Good and Ground Speed
     VTG_SEG             = 5,
 
-}gnssSegmentID;
+    NEMA_SEG_NUM        = 6,
+
+}NemaSegmentID;
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
-#endif //_GNSS_TYPEDEF_H_
+#endif //_NEMA_SENTENCE_H_
