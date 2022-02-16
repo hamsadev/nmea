@@ -1,7 +1,7 @@
 /**
- * @file nemaSentence.h
+ * @file nmeaSentence.h
  * @author Hamid Salehi (hamsame.dev@gmail.com)
- * @brief Nema sentence header file
+ * @brief NmeaSegmentID sentence header file
  * @version 0.1
  * @date 2022-02-13
  * 
@@ -29,14 +29,14 @@
  * 
  */
 
-#ifndef _NEMA_SENTENCE_H_
-#define _NEMA_SENTENCE_H_
+#ifndef _NMEA_SENTENCE_H_
+#define _NMEA_SENTENCE_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-#define NEMA_MESSAGE_MAX_LENGTH 82
+#define NMEA_MESSAGE_MAX_LENGTH 82
 
 /************************************************************************/
 /*  DATAS SEGMENTS TYPEDEFS                                 */
@@ -185,12 +185,12 @@ typedef enum segmentsTag{
     //VTG-Track Made Good and Ground Speed
     VTG_SEG             = 5,
 
-    NEMA_SEG_NUM        = 6,
+    NMEA_SEG_NUM        = 6,
 
-}NemaSegmentID;
+}NmeaSegmentID;
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
-#endif //_NEMA_SENTENCE_H_
+#endif //_NMEA_SENTENCE_H_
