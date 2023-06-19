@@ -1,7 +1,7 @@
 /**
- * @file nmeaSentence.h
+ * @file nmea.h
  * @author Hamid Salehi (hamsame.dev@gmail.com)
- * @brief NmeaSegmentID sentence header file
+ * @brief nmea lib header file
  * @version 0.1
  * @date 2022-02-13
  * 
@@ -36,12 +36,50 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define NMEA_MESSAGE_MAX_LENGTH 82
+#include <stdint.h>
+
+#define NMEA_MESSAGE_MAX_LENGTH     256
+#define NMEA_FIELD_MAX_LENGTH       20
+
+#define NMEA_TALKER_LENGTH          2
+#define NMEA_TYPE_LENGTH            3
+#define NMEA_MESSAGE_ID_LENGTH      NMEA_TALKER_LENGTH + NMEA_TYPE_LENGTH + 1
+
+
+
+typedef struct {
+    char talker[NMEA_TALKER_LENGTH];
+    char type[NMEA_TYPE_LENGTH];
+} NMEAHeader;
+
+typedef struct {
+    char value[NMEA_MESSAGE_MAX_LENGTH];
+    uint16_t length;
+} NMEAField;
+
+typedef struct {
+    NMEAHeader header;
+    NMEAField fields[NMEA_FIELD_MAX_LENGTH];
+    uint8_t fieldCount;
+} NMEASentence;
+
+
+typedef enum {
+    TALKER_GP,  // Global Positioning System (GPS)
+    TALKER_GL,  // Global Navigation Satellite System (GLONASS)
+    TALKER_GN,  // Multiple Global Navigation Satellite Systems (e.g., GPS and GLONASS)
+    TALKER_GA,  // Galileo - European Global Navigation Satellite System
+    TALKER_GB,  // BeiDou - Chinese Satellite Navigation System
+    TALKER_SB,  // Other Satellite-Based Positioning System (non-standard)
+    TALKER_II,  // Internal Inland Navigation System
+    TALKER_IN,  // Indian Regional Navigation Satellite System
+    TALKER_EX,  // European Marine-based Navigation System
+} TalkerType;
 
 /************************************************************************/
 /*  DATAS SEGMENTS TYPEDEFS                                 */
 /************************************************************************/
-typedef enum GGATag
+typedef enum
 {
     GGA_MessageID       = 0, // Message ID
     GGA_UTCTime         = 1, // Time in format 'hhmmss.sss'
@@ -62,10 +100,30 @@ typedef enum GGATag
     GGA_DGPS_Age        = 13, // Age of DGPS data in seconds, empty if DGPS is not used
     GGA_DGPS_StationID  = 14, // DGPS station ID, empty if DGPS is not used
     GGA_checksum        = 15, // Checksum
+    GGA_fieldNum,
 
-}GGA_sentence;
+}GGA_field;
 
-typedef enum GLLTag
+typedef struct {
+    char messageID[NMEA_MESSAGE_ID_LENGTH];
+    double UTCTime;
+    double latitude;
+    char northSouth;
+    double longitude;
+    char eastWest;
+    uint8_t fixStatus;
+    uint8_t SVNum;
+    float HDOP;
+    double altitude;
+    char altitudeUnit;
+    double geoidSeparation;
+    char geoidSeparationUnit;
+    float DGPSAge;
+    uint16_t DGPSStationID;
+    uint8_t checksum;
+} NMEA_GGA;
+
+typedef enum GLLag
 {
     GLL_MessageID       = 0, // Message ID
     GLL_latitude        = 1, // Latitude in format 'ddmm.mmmm' (degrees and minutes)
@@ -76,10 +134,23 @@ typedef enum GLLTag
     GLL_dataValid       = 6, //'V'=Invalid | 'A'=Valid
     GLL_positioningMode = 7, //'N'=No fix | 'A'=Autonomous GNSS fix | D‟=Differential GNSS fix
     GLL_checksum        = 8, // Checksum
+    GLL_fieldNum,
 
-}GLL_sentence;
+}GLL_field;
 
-typedef enum GSATag
+typedef struct {
+    char messageID[NMEA_MESSAGE_ID_LENGTH];
+    double latitude;
+    char northSouth;
+    double longitude;
+    char eastWest;
+    double UTCTime;
+    char dataValid;
+    char positioningMode;
+    uint8_t checksum;
+} NMEA_GLL;
+
+typedef enum 
 {
     GSA_MessageID       = 0, // Message ID
     GSA_mode            = 1, // Auto selection of 2D or 3D fix
@@ -104,10 +175,22 @@ typedef enum GSATag
     GSA_HDOP            = 16, // Horizontal dilution of precision
     GSA_VDOP            = 17, // Vertical dilution of precision
     GSA_checksum        = 18, // Checksum
+    GSA_fieldNum,
     
-}GSA_sentence;
+}GSA_field;
 
-typedef enum GSVTag
+typedef struct {
+    char messageID[NMEA_MESSAGE_ID_LENGTH];
+    char mode;
+    uint8_t fixStatus;
+    uint8_t satelliteUsed[12];
+    float PDOP;
+    float HDOP;
+    float VDOP;
+    uint8_t checksum;
+} NMEA_GSA;
+
+typedef enum 
 {
     GSV_MessageID       = 0, // Message ID
     GSV_messageNumber   = 1, // Number of messagees, total number of GPGSV messages begin output (1~4)
@@ -130,14 +213,31 @@ typedef enum GSVTag
     GSV_azimuth_4       = 18, // Azimuth in degree (0~359)
     GSV_SNR_4           = 19, // Signal to noise ration in dB-Hz (0~99), empty if not tracking
     GSV_checksum        = 20, // Checksum
+    GSV_fieldNum,
 
-}GSV_sentence;
+}GSV_field;
 
-typedef enum RMCTag
+typedef struct {
+    uint8_t satelliteID;
+    uint8_t elevation;
+    uint16_t azimuth;
+    uint8_t SNR;
+} SatelliteInfo;
+
+typedef struct {
+    char messageID[NMEA_MESSAGE_ID_LENGTH];
+    uint8_t messageNumber;
+    uint8_t sequenceNumber;
+    uint8_t satellitesView;
+    SatelliteInfo satelliteInfo[4];
+    uint8_t checksum;
+} NMEAGSV;
+
+typedef enum 
 {
     RMC_MessageID       = 0, // Message ID
     RMC_time            = 1, // Time in format 'hhmmss.ss'
-    RMC_dataValid       = 2, // 'V' = Invalif | 'A' = Valid
+    RMC_status          = 2, // 'V' = Invalif | 'A' = Valid
     RMC_latitude        = 3, // Latitude in format 'ddmm.mmmm' (degrees and minutes)
     RMC_northSouth      = 4, // 'N' = North | 'S' = South
     RMC_Longitude       = 5, // Longitude in format 'ddmm.mmmm' (degrees and minutes)
@@ -149,10 +249,28 @@ typedef enum RMCTag
     RMC_magneticEW      = 11, // Magnetic variation E/W indicator, not being output
     RMC_ositioningMode  = 12, // 'N' = No fix | 'A' = Autonomous GNSS fix | D‟=Differential GNSS fix
     RMC_checksum        = 13, // Checksum
+    RMC_fieldNum,
 
-}RMC_sentence;
+}RMC_field;
 
-typedef enum VTGTag
+typedef struct {
+    char messageID[NMEA_MESSAGE_ID_LENGTH];
+    uint32_t time;
+    uint8_t status;
+    double latitude;
+    char northSouth;
+    double longitude;
+    char eastWest;
+    double speed;
+    double COG;
+    uint32_t date;
+    uint8_t magneticVariation;
+    char magneticEW;
+    uint8_t positioningMode;
+    uint8_t checksum;
+} NMEARMC;
+
+typedef enum 
 { 
     VTG_MessageID       = 0, // Message ID
     VTG_courseGnd_T     = 1, // Course over ground (true) in degree
@@ -163,10 +281,21 @@ typedef enum VTGTag
                              // 'A'= Autonomous GNSS fix
                              // 'D'= Differential GNSS fix
     VTG_checksum        = 10, // Checksum
+    VTG_fieldNum,
 
-}VTG_sentence;
+}VTG_field;
 
-typedef enum segmentsTag{
+typedef struct {
+    char messageID[NMEA_MESSAGE_ID_LENGTH];
+    double courseGnd_T;
+    double courseGnd_M;
+    double speed_knots;
+    double speed_kmh;
+    uint8_t positioningMode;
+    uint8_t checksum;
+} NMEAVTG;
+
+typedef enum {
     /*GGA-Global Positioning System Fix Data, is the essential fix data which provides 3D location and
      accuracy data*/
     GGA_SEG             = 0,
@@ -184,10 +313,10 @@ typedef enum segmentsTag{
     RMC_SEG             = 4,
     //VTG-Track Made Good and Ground Speed
     VTG_SEG             = 5,
+    NMEA_SEG_NUM,
 
-    NMEA_SEG_NUM        = 6,
+}NMEASegmentID;
 
-}NmeaSegmentID;
 
 #ifdef __cplusplus
 }
