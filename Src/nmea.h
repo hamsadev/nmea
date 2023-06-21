@@ -2,23 +2,23 @@
  * @file nmea.h
  * @author Hamid Salehi (hamsame.dev@gmail.com)
  * @brief nmea lib header file
- * @version 0.1
- * @date 2022-02-13
- * 
+ * @version 0.2
+ * @date 2023-06-21
+ *
  * @copyright Copyright (c) 2022 Hamid Salehi
- * 
+ *
  * MIT License
- * 
+ *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is
  *  furnished to do so, subject to the following conditions:
- *  
+ *
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *  
+ *
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,42 +26,28 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
- * 
+ *
  */
 
-#ifndef _NMEA_SENTENCE_H_
-#define _NMEA_SENTENCE_H_
+#ifndef _NMEA_H_
+#define _NMEA_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
 #include <stdint.h>
-
-#define NMEA_MESSAGE_MAX_LENGTH     256
-#define NMEA_FIELD_MAX_LENGTH       20
-
-#define NMEA_TALKER_LENGTH          2
-#define NMEA_TYPE_LENGTH            3
-#define NMEA_MESSAGE_ID_LENGTH      NMEA_TALKER_LENGTH + NMEA_TYPE_LENGTH + 1
+#include "Param.h"
 
 
+#define NMEA_MESSAGE_MAX_LENGTH             255
+#define NMEA_FIELD_MAX_LENGTH               20
 
-typedef struct {
-    char talker[NMEA_TALKER_LENGTH];
-    char type[NMEA_TYPE_LENGTH];
-} NMEAHeader;
+#define NMEA_MESSAGE_TALKER_LENGTH          2
+#define NMEA_MESSAGE_TYPE_LENGTH            3
+#define NMEA_MESSAGE_ID_LENGTH              NMEA_MESSAGE_TALKER_LENGTH + NMEA_MESSAGE_TYPE_LENGTH
 
-typedef struct {
-    char value[NMEA_MESSAGE_MAX_LENGTH];
-    uint16_t length;
-} NMEAField;
-
-typedef struct {
-    NMEAHeader header;
-    NMEAField fields[NMEA_FIELD_MAX_LENGTH];
-    uint8_t fieldCount;
-} NMEASentence;
+#define NMEA_DEBUG                          1
 
 
 typedef enum {
@@ -74,7 +60,8 @@ typedef enum {
     TALKER_II,  // Internal Inland Navigation System
     TALKER_IN,  // Indian Regional Navigation Satellite System
     TALKER_EX,  // European Marine-based Navigation System
-} TalkerType;
+    TALEKR_NUM,
+} NMEA_talkerType;
 
 /************************************************************************/
 /*  DATAS SEGMENTS TYPEDEFS                                 */
@@ -104,25 +91,6 @@ typedef enum
 
 }GGA_field;
 
-typedef struct {
-    char messageID[NMEA_MESSAGE_ID_LENGTH];
-    double UTCTime;
-    double latitude;
-    char northSouth;
-    double longitude;
-    char eastWest;
-    uint8_t fixStatus;
-    uint8_t SVNum;
-    float HDOP;
-    double altitude;
-    char altitudeUnit;
-    double geoidSeparation;
-    char geoidSeparationUnit;
-    float DGPSAge;
-    uint16_t DGPSStationID;
-    uint8_t checksum;
-} NMEA_GGA;
-
 typedef enum GLLag
 {
     GLL_MessageID       = 0, // Message ID
@@ -138,19 +106,7 @@ typedef enum GLLag
 
 }GLL_field;
 
-typedef struct {
-    char messageID[NMEA_MESSAGE_ID_LENGTH];
-    double latitude;
-    char northSouth;
-    double longitude;
-    char eastWest;
-    double UTCTime;
-    char dataValid;
-    char positioningMode;
-    uint8_t checksum;
-} NMEA_GLL;
-
-typedef enum 
+typedef enum
 {
     GSA_MessageID       = 0, // Message ID
     GSA_mode            = 1, // Auto selection of 2D or 3D fix
@@ -176,21 +132,10 @@ typedef enum
     GSA_VDOP            = 17, // Vertical dilution of precision
     GSA_checksum        = 18, // Checksum
     GSA_fieldNum,
-    
+
 }GSA_field;
 
-typedef struct {
-    char messageID[NMEA_MESSAGE_ID_LENGTH];
-    char mode;
-    uint8_t fixStatus;
-    uint8_t satelliteUsed[12];
-    float PDOP;
-    float HDOP;
-    float VDOP;
-    uint8_t checksum;
-} NMEA_GSA;
-
-typedef enum 
+typedef enum
 {
     GSV_MessageID       = 0, // Message ID
     GSV_messageNumber   = 1, // Number of messagees, total number of GPGSV messages begin output (1~4)
@@ -217,23 +162,7 @@ typedef enum
 
 }GSV_field;
 
-typedef struct {
-    uint8_t satelliteID;
-    uint8_t elevation;
-    uint16_t azimuth;
-    uint8_t SNR;
-} SatelliteInfo;
-
-typedef struct {
-    char messageID[NMEA_MESSAGE_ID_LENGTH];
-    uint8_t messageNumber;
-    uint8_t sequenceNumber;
-    uint8_t satellitesView;
-    SatelliteInfo satelliteInfo[4];
-    uint8_t checksum;
-} NMEAGSV;
-
-typedef enum 
+typedef enum
 {
     RMC_MessageID       = 0, // Message ID
     RMC_time            = 1, // Time in format 'hhmmss.ss'
@@ -253,25 +182,8 @@ typedef enum
 
 }RMC_field;
 
-typedef struct {
-    char messageID[NMEA_MESSAGE_ID_LENGTH];
-    uint32_t time;
-    uint8_t status;
-    double latitude;
-    char northSouth;
-    double longitude;
-    char eastWest;
-    double speed;
-    double COG;
-    uint32_t date;
-    uint8_t magneticVariation;
-    char magneticEW;
-    uint8_t positioningMode;
-    uint8_t checksum;
-} NMEARMC;
-
-typedef enum 
-{ 
+typedef enum
+{
     VTG_MessageID       = 0, // Message ID
     VTG_courseGnd_T     = 1, // Course over ground (true) in degree
     VTG_courseGnd_M     = 3, // Course over ground (magnetic), not being output
@@ -285,41 +197,55 @@ typedef enum
 
 }VTG_field;
 
-typedef struct {
-    char messageID[NMEA_MESSAGE_ID_LENGTH];
-    double courseGnd_T;
-    double courseGnd_M;
-    double speed_knots;
-    double speed_kmh;
-    uint8_t positioningMode;
-    uint8_t checksum;
-} NMEAVTG;
-
 typedef enum {
     /*GGA-Global Positioning System Fix Data, is the essential fix data which provides 3D location and
      accuracy data*/
-    GGA_SEG             = 0,
+    NMEA_MESSAGE_TYPE_GGA             = 0,
     /*GLL-Geographic Latitude and Longitude, which contains position information, time of position fix and
     status*/
-    GLL_SEG             = 1,
+    NMEA_MESSAGE_TYPE_GLL             = 1,
     /*GSA-GNSS DOP and Active Satellites, which provides details on the fix and includes the number of
     satellites being used in the current solution and the DOP. At most the first 12 satellite IDs are output*/
-    GSA_SEG             = 2,
+    NMEA_MESSAGE_TYPE_GSA             = 2,
     /*GSV-GNSS Satellites in View. One GSV sentence can only provide data for at most 4 satellites, so
     several sentences might be required for full information. Since GSV includes satellites that are not used
     as part of the solution, GSV sentence contains more satellites than GGA does*/
-    GSV_SEG             = 3,
+    NMEA_MESSAGE_TYPE_GSV             = 3,
     //RMC-Recommended Minimum Position Data (including position, velocity and time)
-    RMC_SEG             = 4,
+    NMEA_MESSAGE_TYPE_RMC             = 4,
     //VTG-Track Made Good and Ground Speed
-    VTG_SEG             = 5,
-    NMEA_SEG_NUM,
+    NMEA_MESSAGE_TYPE_VTG             = 5,
+    NMEA_MESSAGE_TYPE_NUM,
 
-}NMEASegmentID;
+}NMEA_messageType;
 
+typedef enum {
+    NMEA_OK,
+    NMEA_ERROR,
+    NMEA_MESSAGE_ID_ERROR,
+    NMEA_INVALID_TALKER,
+    NMEA_INVALID_MESSAGE_TYPE,
+}NMEA_result;
+
+
+typedef struct {
+    NMEA_talkerType talker;
+    NMEA_messageType type;
+} NMEA_Header;
+
+typedef Param NMEA_Field;
+typedef uint16_t NMEA_LenType;
+
+typedef struct {
+    NMEA_Header header;
+    NMEA_Field* fields;
+    NMEA_LenType fieldCount;
+} NMEA_sentence;
+
+NMEA_LenType NMEA_parseSentence(NMEA_sentence* nmea, NMEA_Field* buffer, NMEA_LenType len, char* src);
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
-#endif //_NMEA_SENTENCE_H_
+#endif //_NMEA_H_
