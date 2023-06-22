@@ -47,8 +47,11 @@ extern "C" {
 #define NMEA_MESSAGE_TYPE_LENGTH            3
 #define NMEA_MESSAGE_ID_LENGTH              NMEA_MESSAGE_TALKER_LENGTH + NMEA_MESSAGE_TYPE_LENGTH
 
-#define NMEA_DEBUG                          1
-
+#define NMEA_DEBUG                          0
+#if NMEA_DEBUG
+#define PRINTLN			puts
+#define PRINTF		    printf
+#endif // NMEA_DEBUG
 
 typedef enum {
     TALKER_GP,  // Global Positioning System (GPS)
@@ -220,11 +223,11 @@ typedef enum {
 }NMEA_messageType;
 
 typedef enum {
-    NMEA_OK,
-    NMEA_ERROR,
-    NMEA_MESSAGE_ID_ERROR,
-    NMEA_INVALID_TALKER,
-    NMEA_INVALID_MESSAGE_TYPE,
+    NMEA_OK                     =  0,
+    NMEA_ERROR                  = -1,
+    NMEA_MESSAGE_ID_ERROR       = -2,
+    NMEA_INVALID_TALKER         = -3,
+    NMEA_INVALID_MESSAGE_TYPE   = -4,
 }NMEA_result;
 
 
@@ -234,7 +237,7 @@ typedef struct {
 } NMEA_Header;
 
 typedef Param NMEA_Field;
-typedef uint16_t NMEA_LenType;
+typedef int16_t NMEA_LenType;
 
 typedef struct {
     NMEA_Header header;

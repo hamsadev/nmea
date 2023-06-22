@@ -1,8 +1,5 @@
 #include "nmea.h"
 
-#define PRINTLN			puts
-#define PRINTF		    printf
-
 #define STR(S)          {S, sizeof(S) - 1}
 
 static void Param_print(Param* param);
@@ -44,10 +41,10 @@ NMEA_LenType NMEA_parseSentence(NMEA_sentence* nmea, NMEA_Field* buffer, NMEA_Le
         Param_print(&param);
         #endif // NMEA_DEBUG
     }
-
+    nmea->fieldCount = param.Index + 1;
     NMEA_result error = NMEA_parseHeader(&nmea->header, buffer[0].Value.String);
 
-    return error ? error : param.Index;
+    return error ? error : nmea->fieldCount;
 }
 
 static NMEA_result NMEA_parseHeader(NMEA_Header* header, char* src){
@@ -84,7 +81,7 @@ static Mem_CmpResult strConst_compare(const void* itemA, const void* itemB, Mem_
   return memcmp(((StrConst*) itemA)->Text, ((StrConst*) itemB)->Text, len);
 }
 
-
+#if NMEA_DEBUG
 static void Param_print(Param* param) {
     static const char* PARAM_TYPES[] = {
         "Unknown",
@@ -134,3 +131,5 @@ static void Param_print(Param* param) {
     }
     PRINTLN("}");
 }
+#endif // NMEA_DEBUG
+
