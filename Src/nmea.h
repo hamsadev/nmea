@@ -228,6 +228,7 @@ typedef enum {
     NMEA_MESSAGE_ID_ERROR       = -2,
     NMEA_INVALID_TALKER         = -3,
     NMEA_INVALID_MESSAGE_TYPE   = -4,
+    NMEA_MESSAGE_NOT_FOUND      = -5
 }NMEA_result;
 
 

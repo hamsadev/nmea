@@ -31,6 +31,10 @@ NMEA_LenType NMEA_parseSentence(NMEA_sentence* nmea, NMEA_Field* buffer, NMEA_Le
     Param param;
     Param_Cursor cursor;
 
+    src = strchr(src, '$');
+    if(!src){
+        return NMEA_MESSAGE_NOT_FOUND;
+    }
     src = Str_ignoreSpecialCharacters(src);
     Param_initCursor(&cursor, src, Str_len(src), ',');
 
