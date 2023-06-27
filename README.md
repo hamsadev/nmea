@@ -34,11 +34,6 @@ NMEA_LenType ret = NMEA_parseSentence(&nmea, &fields, GGA_fieldNum, GGA_testSent
 5. If the output is smaller than 0, there is a problem in the parsing process, otherwise the result is the number of fields that have been parsed and saved.
 6. You can find the details of the parsing operation through nmea
 
-## Issue
-- This library will crash if there is an empty parameter.
-This problem is from the param library and a [pull request](https://github.com/Ali-Mirghasemi/Param/pull/2) has been created to solve this problem.
-You can use [this branch](https://github.com/hamsaco/Param/tree/bug_fix/emptyParamCrash) until the pull request is merged.
-
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
 
